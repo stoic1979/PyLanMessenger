@@ -2,6 +2,8 @@ from Tkinter import *
 import tkFileDialog
 import socket
 
+from utils import get_ip_address
+
 
 class MainGui:
 
@@ -23,6 +25,9 @@ class MainGui:
         Button(fm, text="Send", width=10).pack(side=LEFT)
 
         self.add_menus()
+
+        # getting IP Address of system
+        self.ip = get_ip_address()
 
         # start
         self.root.mainloop()
