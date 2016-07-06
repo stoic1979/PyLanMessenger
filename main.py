@@ -4,6 +4,7 @@ import socket
 import thread
 
 from utils import get_ip_address
+from settings import *
 
 
 class MainGui:
@@ -36,9 +37,6 @@ class MainGui:
         self.root.mainloop()
 
     def monitor_messages(self, thread_name, delay):
-        UDP_IP = "127.0.0.1"
-        UDP_PORT = 5005
-
         sock = socket.socket(socket.AF_INET, # Internet
                             socket.SOCK_DGRAM) # UDP
         sock.bind((UDP_IP, UDP_PORT))
