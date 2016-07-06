@@ -1,16 +1,38 @@
 from Tkinter import *
+import tkFileDialog
 
 
-root = Tk()
-root.wm_title("Lan Messenger") 
+class MainGui:
 
-fm = Frame(root, width=300, height=200, bg="blue")
-fm.pack(side=TOP, expand=NO, fill=NONE)
+    def __init__(self):
+        self.root = Tk()
+        self.root.wm_title("Lan Messenger") 
     
-root.geometry("640x480") 
+        # gui frame
+        fm = Frame(self.root, width=300, height=200, bg="blue")
+        fm.pack(side=TOP, expand=NO, fill=NONE)
+    
+        # dimensions
+        self.root.geometry("640x480") 
 
-Button(fm, text="Send File", width=10).pack(side=LEFT)
-Button(fm, text="Send", width=10).pack(side=LEFT)
+        # buttons
+        Button(fm, text="Send File", width=10, command=self.send_file).pack(side=LEFT)
+        Button(fm, text="Send", width=10).pack(side=LEFT)
+
+        # start
+        self.root.mainloop()
+
+    def send_file(self):
+        file_types = [('All files', '*')]
+        open = tkFileDialog.Open(self.root, filetypes = file_types)
+        statusbar = Label(self.root, text="", bd=1, relief=SUNKEN, anchor=W)
+        statusbar.pack(side=BOTTOM, fill=X)
+        file_path = open.show()
+        statusbar.config(text = file_path)
+        print "Will send file", file_path
 
 
-root.mainloop()
+#########################
+#   STARTING MAIN GUI   #
+#########################
+MainGui()
