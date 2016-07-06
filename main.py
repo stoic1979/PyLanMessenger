@@ -1,12 +1,15 @@
 from Tkinter import *
 import tkFileDialog
+import socket
 
 
 class MainGui:
 
     def __init__(self):
         self.root = Tk()
-        self.root.wm_title("Lan Messenger") 
+
+        self.hostname = socket.gethostname()
+        self.root.wm_title("Lan Messenger - %s" % self.hostname) 
     
         # gui frame
         fm = Frame(self.root, width=300, height=200, bg="blue")
