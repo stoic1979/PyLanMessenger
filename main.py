@@ -1,6 +1,7 @@
 from Tkinter import *
 import tkFileDialog
 import socket
+import thread
 
 from utils import get_ip_address
 
@@ -29,8 +30,33 @@ class MainGui:
         # getting IP Address of system
         self.ip = get_ip_address()
 
+        self.start_msg_receiver()
+
         # start
         self.root.mainloop()
+
+    def monitor_messages(self, thread_name, delay):
+        UDP_IP = "127.0.0.1"
+        UDP_PORT = 5005
+
+        sock = socket.socket(socket.AF_INET, # Internet
+                            socket.SOCK_DGRAM) # UDP
+        sock.bind((UDP_IP, UDP_PORT))
+
+        while True:
+            # buffer size is 1024 bytes
+            data, addr = sock.recvfrom(1024)
+            print "received message:", data
+
+    def start_msg_receiver(self):
+        """
+        function starts a thread to receive messages
+        """
+        try:
+            thread.start_new_thread(self.monitor_messages, ("MsgRecvThread", 2, ) )
+        except Exception as exp:
+            print "Error: unable to start message recevier thread"
+            print exp
 
     def hello(self):
         print "hello"
