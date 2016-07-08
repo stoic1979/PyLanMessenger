@@ -38,7 +38,8 @@ class MainGui:
         self.root.mainloop()
 
     def refresh(self):
-        print "refreshing users list"
+        # broadcast a message that IAI - "I Am In" the n/w
+        self.send_broadcast_message("IAI%s" % self.ip)
 
     def send_broadcast_message(self, msg):
         """
@@ -47,6 +48,7 @@ class MainGui:
         """
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         sock.sendto(msg, (UDP_IP, UDP_PORT))
+        print "[INFO] :: message sent", msg
 
     def monitor_messages(self, thread_name, delay):
         sock = socket.socket(socket.AF_INET, # Internet
