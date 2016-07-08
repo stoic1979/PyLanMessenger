@@ -25,6 +25,7 @@ class MainGui:
         # buttons
         Button(fm, text="Send File", width=10, command=self.send_file).pack(side=LEFT)
         Button(fm, text="Send", width=10).pack(side=LEFT)
+        Button(fm, text="Refresh", width=10, command=self.refresh).pack(side=LEFT)
 
         self.add_menus()
 
@@ -35,6 +36,9 @@ class MainGui:
 
         # start
         self.root.mainloop()
+
+    def refresh(self):
+        print "refreshing users list"
 
     def monitor_messages(self, thread_name, delay):
         sock = socket.socket(socket.AF_INET, # Internet
