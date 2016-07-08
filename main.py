@@ -38,6 +38,8 @@ class MainGui:
         for line in range(100):
             mylist.insert(END, "This is line number " + str(line))
         mylist.pack(side=LEFT, fill=NONE)
+
+        self.mylist = mylist
         
         scrollbar.config(command=mylist.yview)
 
@@ -57,6 +59,7 @@ class MainGui:
 
     def send_msg(self):
         print "send msg: ", self.text.get("1.0",END)
+        print "selected is: ", self.mylist.get(self.mylist.curselection())
 
     def send_broadcast_message(self, msg):
         """
