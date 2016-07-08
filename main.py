@@ -25,7 +25,7 @@ class MainGui:
 
         # buttons
         Button(fm, text="Send File", width=10, command=self.send_file).pack(side=LEFT)
-        Button(fm, text="Send", width=10).pack(side=LEFT)
+        Button(fm, text="Send", width=10, command=self.send_msg).pack(side=LEFT)
         Button(fm, text="Refresh", width=10, command=self.refresh).pack(side=LEFT)
 
         self.text = Text(fm, relief=SUNKEN)
@@ -54,6 +54,9 @@ class MainGui:
     def refresh(self):
         # broadcast a message that IAI - "I Am In" the n/w
         self.send_broadcast_message("IAI%s" % self.ip)
+
+    def send_msg(self):
+        print "send msg: ", self.text.get("1.0",END)
 
     def send_broadcast_message(self, msg):
         """
