@@ -40,6 +40,14 @@ class MainGui:
     def refresh(self):
         print "refreshing users list"
 
+    def send_broadcast_message(self, msg):
+        """
+        function to send UDP message to all users in LAN
+        at given port
+        """
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        sock.sendto(msg, (UDP_IP, UDP_PORT))
+
     def monitor_messages(self, thread_name, delay):
         sock = socket.socket(socket.AF_INET, # Internet
                             socket.SOCK_DGRAM) # UDP
