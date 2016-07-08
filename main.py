@@ -22,10 +22,24 @@ class MainGui:
         # dimensions
         self.root.geometry("640x480") 
 
+
         # buttons
         Button(fm, text="Send File", width=10, command=self.send_file).pack(side=LEFT)
         Button(fm, text="Send", width=10).pack(side=LEFT)
         Button(fm, text="Refresh", width=10, command=self.refresh).pack(side=LEFT)
+
+        self.text = Text(fm, relief=SUNKEN)
+        self.text.pack(side=LEFT, expand=YES, fill=BOTH)  
+
+        scrollbar = Scrollbar(fm)
+        scrollbar.pack(side=RIGHT, fill=Y)
+
+        mylist = Listbox(fm, yscrollcommand=scrollbar.set)
+        for line in range(100):
+            mylist.insert(END, "This is line number " + str(line))
+        mylist.pack(side=LEFT, fill=NONE)
+        
+        scrollbar.config(command=mylist.yview)
 
         self.add_menus()
 
