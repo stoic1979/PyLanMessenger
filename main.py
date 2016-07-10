@@ -137,7 +137,9 @@ class MainGui(Frame):
     def handle_IAI(self, msg):
         status, ip, host = process_IAI(msg)
         if status:
-            self.mylist.insert(END, "%s - %s" % (host, ip))
+            if not self.users.has_key(host):
+                self.users[host] = ip
+                self.mylist.insert(END, "%s - %s" % (host, ip))
 
     def start_msg_receiver(self):
         """
