@@ -34,17 +34,17 @@ class MainGui(Frame):
         lbl.grid(sticky=W, pady=4, padx=5)
 
         # list....
-        #scrollbar = Scrollbar(self)
-        #scrollbar.grid(row=1, column=0, columnspan=2, rowspan=2, padx=5)
+        scrollbar = Scrollbar(self)
+        scrollbar.grid(row=1, column=0, columnspan=2, rowspan=2, padx=5)
 
-        #mylist = Listbox(self, yscrollcommand=scrollbar.set)
-        mylist = Listbox(self)
+        mylist = Listbox(self, yscrollcommand=scrollbar.set)
+        #mylist = Listbox(self)
         mylist.grid(row=0, column=0, columnspan=1, rowspan=8, padx=5, sticky=E+W+N+S)
 
         mylist.bind('<<ListboxSelect>>', self.on_user_selection_changed)
 
         self.mylist = mylist
-        #scrollbar.config(command=mylist.yview)
+        scrollbar.config(command=mylist.yview)
         # list....
         
 
@@ -113,7 +113,10 @@ class MainGui(Frame):
     def on_user_selection_changed(self, evt):
         # Note here that Tkinter passes an event object to on_user_selection_changed()
         w = evt.widget
-        index = int(w.curselection()[0])
+        try:
+            index = int(w.curselection()[0])
+        except:
+            return
         sel_user = w.get(index)
         print 'You selected item %d: "%s"' % (index, sel_user)
 
