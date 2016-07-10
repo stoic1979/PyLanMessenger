@@ -54,7 +54,7 @@ class MainGui:
 
     def refresh(self):
         # broadcast a message that IAI - "I Am In" the n/w
-        self.send_broadcast_message("IAI%s" % self.ip)
+        self.send_broadcast_message("IAI%s:%s" % (self.ip, self.hostname))
 
     def send_msg(self):
         msg = self.text.get("1.0",END)
