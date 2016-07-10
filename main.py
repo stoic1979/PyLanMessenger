@@ -16,6 +16,7 @@ class MainGui(Frame):
          
         self.parent = parent
         self.initUI()
+        self.init_messenger()
         
         
     def initUI(self):
@@ -59,12 +60,13 @@ class MainGui(Frame):
               
         self.add_menus()
 
+
+    def init_messenger(self):
         # getting IP Address of system
         self.ip = get_ip_address()
-
         self.start_msg_receiver()
-
         self.send_IAI()
+        self.users = {}
 
     def add_menus(self):
         menubar = Menu(self.parent)
@@ -133,7 +135,6 @@ class MainGui(Frame):
                 self.handle_IAI(data)
 
     def handle_IAI(self, msg):
-        self.send_IAI()
         status, ip, host = process_IAI(msg)
         if status:
             self.mylist.insert(END, "%s - %s" % (host, ip))
