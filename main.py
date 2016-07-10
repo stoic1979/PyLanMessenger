@@ -177,6 +177,8 @@ class MainGui(Frame):
             print "received message:", data
             if data[:3] == "IAI":
                 self.handle_IAI(data)
+            if data[:3] == "MTI":
+                self.handle_MTI(data)
             if data[:3] == "TCM":
                 self.handle_TCM(data)
 
