@@ -103,11 +103,21 @@ class MainGui(Frame):
         # broadcast a message that IAI - "I Am In" the n/w
         self.send_broadcast_message("IAI%s:%s" % (self.ip, self.hostname))
 
+    def get_selected_user_ip(self, txt):
+        for k,v in self.users.iteritems():
+            if txt == "%s - %s" % (k,v):
+                return v
+
     def send_msg(self):
         msg = self.text.get("1.0",END)
         print "send msg: ", self.text.get("1.0",END)
-        #print "selected is: ", self.mylist.get(self.mylist.curselection())
-        self.send_broadcast_message(msg)
+
+        try:
+            txt = self.mylist.get(self.mylist.curselection())
+        except:
+            return
+
+        self.send_to_ip(self.get_selected_user_ip(txt), msg)
 
     def send_broadcast_message(self, msg):
         """
@@ -121,6 +131,13 @@ class MainGui(Frame):
             if self.ip == recv_ip:
                 continue
             sock.sendto(msg, (recv_ip, UDP_PORT))
+
+    def send_to_ip(self, ip, msg):
+        """
+        function to send UDP message to given ip
+        """
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        sock.sendto("TCM%s" % msg, (ip, UDP_PORT))
 
     def monitor_messages(self, thread_name, delay):
         sock = socket.socket(socket.AF_INET, # Internet
