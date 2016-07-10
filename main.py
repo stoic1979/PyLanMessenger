@@ -1,4 +1,6 @@
 from Tkinter import *
+from ttk import Frame, Button, Label, Style
+
 import tkFileDialog
 import socket
 import thread
@@ -7,41 +9,56 @@ from utils import *
 from settings import *
 
 
-class MainGui:
-
-    def __init__(self):
-        self.root = Tk()
-
+class MainGui(Frame):
+  
+    def __init__(self, parent):
+        Frame.__init__(self, parent)   
+         
+        self.parent = parent
+        self.initUI()
+        
+        
+    def initUI(self):
+      
         self.hostname = socket.gethostname()
-        self.root.wm_title("Lan Messenger - %s" % self.hostname) 
-    
-        # gui frame
-        fm = Frame(self.root, width=300, height=200, bg="blue")
-        fm.pack(side=TOP, expand=NO, fill=NONE)
-    
-        # dimensions
-        self.root.geometry("640x480") 
+        self.parent.title("Lan Messenger - %s" % self.hostname) 
+        #self.parent.title("Windows")
+        self.pack(fill=BOTH, expand=True)
 
-        # buttons
-        Button(fm, text="Send File", width=10, command=self.send_file).pack(side=LEFT)
-        Button(fm, text="Send", width=10, command=self.send_msg).pack(side=LEFT)
-        Button(fm, text="Refresh", width=10, command=self.refresh).pack(side=LEFT)
+        self.columnconfigure(1, weight=1)
+        self.columnconfigure(3, pad=7)
+        self.rowconfigure(3, weight=1)
+        self.rowconfigure(10, pad=7)
+        
+        lbl = Label(self, text="Welcome - %s" % self.hostname)
+        lbl.grid(sticky=W, pady=4, padx=5)
 
-        self.text = Text(fm, relief=SUNKEN)
-        self.text.pack(side=LEFT, expand=YES, fill=BOTH)  
+        # list....
+        scrollbar = Scrollbar(self)
+        scrollbar.grid(row=1, column=0, columnspan=2, rowspan=2, padx=5)
 
-        scrollbar = Scrollbar(fm)
-        scrollbar.pack(side=RIGHT, fill=Y)
-
-        mylist = Listbox(fm, yscrollcommand=scrollbar.set)
+        mylist = Listbox(self, yscrollcommand=scrollbar.set)
         for line in range(100):
-            mylist.insert(END, "This is line number " + str(line))
-        mylist.pack(side=LEFT, fill=NONE)
+            mylist.insert(END, "User " + str(line))
+        mylist.grid(row=1, column=0, columnspan=2, rowspan=2, padx=5, sticky=E+W)
 
         self.mylist = mylist
-        
         scrollbar.config(command=mylist.yview)
+        # list....
+        
+        area = Text(self)
+        area.grid(row=6, column=0, columnspan=2, rowspan=4, padx=5, sticky=E+W)
+        self.text = area
+        
+        abtn = Button(self, text="Refresh", command=self.refresh)
+        abtn.grid(row=0, column=3)
 
+        cbtn = Button(self, text="Send", command=self.send_msg)
+        cbtn.grid(row=1, column=3, pady=4)
+
+        dbtn = Button(self, text="Send File", command=self.send_file)
+        dbtn.grid(row=2, column=3, pady=4)
+              
         self.add_menus()
 
         # getting IP Address of system
@@ -49,8 +66,33 @@ class MainGui:
 
         self.start_msg_receiver()
 
-        # start
-        self.root.mainloop()
+    def add_menus(self):
+        menubar = Menu(self.parent)
+
+        # create a pulldown menu, and add it to the menu bar
+        filemenu = Menu(menubar, tearoff=0)
+        filemenu.add_command(label="Open", command=self.hello)
+        filemenu.add_command(label="Save", command=self.hello)
+        filemenu.add_separator()
+        filemenu.add_command(label="Exit", command=self.parent.quit)
+        menubar.add_cascade(label="File", menu=filemenu)
+
+        # create more pulldown menus
+        editmenu = Menu(menubar, tearoff=0)
+        editmenu.add_command(label="Cut", command=self.hello)
+        editmenu.add_command(label="Copy", command=self.hello)
+        editmenu.add_command(label="Paste", command=self.hello)
+        menubar.add_cascade(label="Edit", menu=editmenu)
+
+        helpmenu = Menu(menubar, tearoff=0)
+        helpmenu.add_command(label="About", command=self.hello)
+        menubar.add_cascade(label="Help", menu=helpmenu)
+
+        # display the menu
+        self.parent.config(menu=menubar)
+
+    def hello(self):
+        print "hello"
 
     def refresh(self):
         # broadcast a message that IAI - "I Am In" the n/w
@@ -95,34 +137,6 @@ class MainGui:
             print "Error: unable to start message recevier thread"
             print exp
 
-    def hello(self):
-        print "hello"
-
-    def add_menus(self):
-        menubar = Menu(self.root)
-
-        # create a pulldown menu, and add it to the menu bar
-        filemenu = Menu(menubar, tearoff=0)
-        filemenu.add_command(label="Open", command=self.hello)
-        filemenu.add_command(label="Save", command=self.hello)
-        filemenu.add_separator()
-        filemenu.add_command(label="Exit", command=self.root.quit)
-        menubar.add_cascade(label="File", menu=filemenu)
-
-        # create more pulldown menus
-        editmenu = Menu(menubar, tearoff=0)
-        editmenu.add_command(label="Cut", command=self.hello)
-        editmenu.add_command(label="Copy", command=self.hello)
-        editmenu.add_command(label="Paste", command=self.hello)
-        menubar.add_cascade(label="Edit", menu=editmenu)
-
-        helpmenu = Menu(menubar, tearoff=0)
-        helpmenu.add_command(label="About", command=self.hello)
-        menubar.add_cascade(label="Help", menu=helpmenu)
-
-        # display the menu
-        self.root.config(menu=menubar)
-
     def quit(self):
         self.root.quit()
 
@@ -135,8 +149,14 @@ class MainGui:
         statusbar.config(text = file_path)
         print "Will send file", file_path
 
+def main():
+  
+    root = Tk()
+    root.geometry("640x480+200+200")
+    app = MainGui(root)
+    root.mainloop()  
 
-#########################
-#   STARTING MAIN GUI   #
-#########################
-MainGui()
+
+if __name__ == '__main__':
+    main()  
+
