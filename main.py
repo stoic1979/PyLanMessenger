@@ -3,7 +3,7 @@ import tkFileDialog
 import socket
 import thread
 
-from utils import get_ip_address
+from utils import *
 from settings import *
 
 
@@ -21,7 +21,6 @@ class MainGui:
     
         # dimensions
         self.root.geometry("640x480") 
-
 
         # buttons
         Button(fm, text="Send File", width=10, command=self.send_file).pack(side=LEFT)
@@ -58,8 +57,10 @@ class MainGui:
         self.send_broadcast_message("IAI%s" % self.ip)
 
     def send_msg(self):
+        msg = self.text.get("1.0",END)
         print "send msg: ", self.text.get("1.0",END)
-        print "selected is: ", self.mylist.get(self.mylist.curselection())
+        #print "selected is: ", self.mylist.get(self.mylist.curselection())
+        self.send_broadcast_message(msg)
 
     def send_broadcast_message(self, msg):
         """
@@ -67,13 +68,15 @@ class MainGui:
         at given port
         """
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        sock.sendto(msg, (UDP_IP, UDP_PORT))
-        print "[INFO] :: message sent", msg
+        for i in range(2, 255):
+            recv_ip = "%s.%d" % (get_ip_prefix(self.ip), i)
+            sock.sendto(msg, (recv_ip, UDP_PORT))
+            print "[INFO] :: %s => %s", (recv_ip, msg)
 
     def monitor_messages(self, thread_name, delay):
         sock = socket.socket(socket.AF_INET, # Internet
                             socket.SOCK_DGRAM) # UDP
-        sock.bind((UDP_IP, UDP_PORT))
+        sock.bind((self.ip, UDP_PORT))
 
         while True:
             # buffer size is 1024 bytes
