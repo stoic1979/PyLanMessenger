@@ -76,7 +76,7 @@ class MainGui:
     def monitor_messages(self, thread_name, delay):
         sock = socket.socket(socket.AF_INET, # Internet
                             socket.SOCK_DGRAM) # UDP
-        sock.bind((self.ip, UDP_PORT))
+        sock.bind(('', UDP_PORT))
 
         while True:
             # buffer size is 1024 bytes
