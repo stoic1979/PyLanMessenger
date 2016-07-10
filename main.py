@@ -69,9 +69,11 @@ class MainGui:
         """
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         for i in range(2, 255):
+            # dont send to self
+            if self.ip == recv_ip:
+                continue
             recv_ip = "%s.%d" % (get_ip_prefix(self.ip), i)
             sock.sendto(msg, (recv_ip, UDP_PORT))
-            print "[INFO] :: %s => %s", (recv_ip, msg)
 
     def monitor_messages(self, thread_name, delay):
         sock = socket.socket(socket.AF_INET, # Internet
