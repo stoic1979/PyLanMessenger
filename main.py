@@ -239,7 +239,7 @@ class MainGui(Frame):
         if not status:
             return
 
-        self.add_chat_msg(ip, host, "%s: %s" (host, msg))
+        self.add_chat_msg(ip, host, "%s: %s" % (host, msg))
         print "Got message %s from %s" % (msg, ip)
     
     def start_msg_receiver(self):
