@@ -114,8 +114,18 @@ class MainGui(Frame):
         # Note here that Tkinter passes an event object to on_user_selection_changed()
         w = evt.widget
         index = int(w.curselection()[0])
-        value = w.get(index)
-        print 'You selected item %d: "%s"' % (index, value)
+        sel_user = w.get(index)
+        print 'You selected item %d: "%s"' % (index, sel_user)
+
+        self.msg_lst.delete(0, END)
+
+        # no need to continue if there are no messages for selected user
+        if not self.messages.has_key(sel_user):
+            return
+
+        msgs = self.messages[sel_user]
+        for m in msgs:
+            self.mylist.insert(END, m)
 
     def hello(self):
         print "hello"
@@ -161,8 +171,8 @@ class MainGui(Frame):
             sock.sendto(msg, (recv_ip, UDP_PORT))
 
     def add_chat_msg(self, ip, host, msg):
-        if not self.messages.has_key(ip):
-            self.messages[ip] = []
+        if not self.messages.has_key(host):
+            self.messages[host] = []
         m = "%s: %s" % (host, msg)
         self.messages[ip].append(m)
         self.msg_lst.insert(END, m)
