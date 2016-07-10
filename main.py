@@ -118,6 +118,10 @@ class MainGui(Frame):
         # broadcast a message that IAI - "I Am In" the n/w
         self.send_broadcast_message("IAI%s:%s" % (self.ip, self.hostname))
 
+    def send_MTI(self):
+        # broadcast a message that MTI - "Me Too In" the n/w
+        self.send_broadcast_message("MTI%s:%s" % (self.ip, self.hostname))
+
     def get_selected_user_ip(self, txt):
         for k,v in self.users.iteritems():
             if txt == "%s - %s" % (k,v):
@@ -177,7 +181,22 @@ class MainGui(Frame):
                 self.handle_TCM(data)
 
     def handle_IAI(self, msg):
+        # reply with MTI for IAI
+        # me too in when other says "i am in"
+        self.send_MTI()
+
         status, ip, host = process_IAI(msg)
+        if status:
+            if not self.users.has_key(host):
+                self.users[host] = ip
+                self.mylist.insert(END, "%s - %s" % (host, ip))
+
+    def handle_MTI(self, msg):
+        # reply with MTI for IAI
+        # me too in when other says "i am in"
+        self.send_MTI()
+
+        status, ip, host = process_MTI(msg)
         if status:
             if not self.users.has_key(host):
                 self.users[host] = ip
