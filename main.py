@@ -66,6 +66,8 @@ class MainGui(Frame):
 
         self.start_msg_receiver()
 
+        self.send_IAI()
+
     def add_menus(self):
         menubar = Menu(self.parent)
 
@@ -95,6 +97,9 @@ class MainGui(Frame):
         print "hello"
 
     def refresh(self):
+        self.send_IAI()
+
+    def send_IAI(self):
         # broadcast a message that IAI - "I Am In" the n/w
         self.send_broadcast_message("IAI%s:%s" % (self.ip, self.hostname))
 
