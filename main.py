@@ -124,8 +124,9 @@ class MainGui(Frame):
             return
 
         msgs = self.messages[sel_user]
+        print "msgs:", msgs
         for m in msgs:
-            self.mylist.insert(END, m)
+            self.msg_lst.insert(END, m)
 
     def hello(self):
         print "hello"
@@ -151,11 +152,11 @@ class MainGui(Frame):
         print "send msg: ", self.text.get("1.0",END)
 
         try:
-            txt = self.mylist.get(self.mylist.curselection())
+            host = self.mylist.get(self.mylist.curselection())
         except:
             return
 
-        self.send_to_ip(self.users[txt], msg.strip())
+        self.send_to_ip(self.users[host], host, msg.strip())
 
     def send_broadcast_message(self, msg):
         """
@@ -170,20 +171,24 @@ class MainGui(Frame):
                 continue
             sock.sendto(msg, (recv_ip, UDP_PORT))
 
-    def add_chat_msg(self, ip, host, msg):
-        if not self.messages.has_key(host):
-            self.messages[host] = []
-        m = "%s: %s" % (host, msg)
-        self.messages[host].append(m)
-        self.msg_lst.insert(END, m)
+    def add_chat_msg(self, ip, other_host, msg):
 
-    def send_to_ip(self, ip, msg):
+        # NOTE:
+        # we are storing msgs in dict as per other host
+        # both sent/recvd msgs with other host
+        if not self.messages.has_key(other_host):
+            self.messages[other_host] = []
+
+        self.messages[other_host].append(msg)
+        self.msg_lst.insert(END, msg)
+
+    def send_to_ip(self, ip, other_host, msg):
         """
         function to send UDP message to given ip
         """
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         sock.sendto("TCM%s:%s:%s" % (self.ip, self.hostname, msg), (ip, UDP_PORT))
-        self.add_chat_msg(ip, self.hostname, msg)
+        self.add_chat_msg(ip, other_host, "%s: %s" % (self.hostname, msg) )
 
     def monitor_messages(self, thread_name, delay):
         sock = socket.socket(socket.AF_INET, # Internet
@@ -234,7 +239,7 @@ class MainGui(Frame):
         if not status:
             return
 
-        self.add_chat_msg(ip, host, msg)
+        self.add_chat_msg(ip, host, "%s: %s" (host, msg))
         print "Got message %s from %s" % (msg, ip)
     
     def start_msg_receiver(self):
