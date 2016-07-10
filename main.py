@@ -28,35 +28,51 @@ class MainGui(Frame):
 
         self.columnconfigure(1, weight=1)
         self.columnconfigure(3, pad=7)
-        self.rowconfigure(3, weight=1)
-        self.rowconfigure(10, pad=7)
+        self.rowconfigure(4, weight=1)
+        self.rowconfigure(5, pad=7)
         
         lbl = Label(self, text="Welcome - %s" % self.hostname)
         lbl.grid(sticky=W, pady=4, padx=5)
 
         # list....
-        scrollbar = Scrollbar(self)
-        scrollbar.grid(row=1, column=0, columnspan=2, rowspan=2, padx=5)
+        #scrollbar = Scrollbar(self)
+        #scrollbar.grid(row=1, column=0, columnspan=2, rowspan=2, padx=5)
 
-        mylist = Listbox(self, yscrollcommand=scrollbar.set)
-        mylist.grid(row=1, column=0, columnspan=2, rowspan=2, padx=5, sticky=E+W)
+        #mylist = Listbox(self, yscrollcommand=scrollbar.set)
+        mylist = Listbox(self)
+        for line in range(100):
+            mylist.insert(END, "User " + str(line))
+        mylist.grid(row=0, column=0, columnspan=1, rowspan=8, padx=5, sticky=E+W+N+S)
 
         self.mylist = mylist
-        scrollbar.config(command=mylist.yview)
+        #scrollbar.config(command=mylist.yview)
         # list....
         
-        area = Text(self)
-        area.grid(row=6, column=0, columnspan=2, rowspan=4, padx=5, sticky=E+W)
-        self.text = area
+
+        frame2 = Frame(self)
+        frame2.columnconfigure(1, weight=1)
+        frame2.columnconfigure(3, pad=7)
+        frame2.rowconfigure(3, weight=1)
+        frame2.rowconfigure(5, pad=7)
+
+        frame2.grid(row=0, column=1, columnspan=2, rowspan=8, padx=5, sticky=E+W+N+S)
+
+        area = Listbox(frame2)
+        area.grid(row=1, column=0, columnspan=2, rowspan=6, padx=5, sticky=E+W+S+N)
+
+        ma = Text(frame2)
+        ma.grid(row=4, column=0, columnspan=2, rowspan=2, padx=5, sticky=E+W+S+N)
+        self.text = ma
         
         abtn = Button(self, text="Refresh", command=self.refresh)
         abtn.grid(row=0, column=3)
 
         cbtn = Button(self, text="Send", command=self.send_msg)
-        cbtn.grid(row=1, column=3, pady=4)
+        cbtn.grid(row=5, column=3, pady=4)
 
         dbtn = Button(self, text="Send File", command=self.send_file)
         dbtn.grid(row=2, column=3, pady=4)
+
               
         self.add_menus()
 
@@ -203,7 +219,7 @@ class MainGui(Frame):
 #########################
 def main():
     root = Tk()
-    root.geometry("640x480+200+200")
+    root.geometry("960x640+100+40")
     app = MainGui(root)
     root.mainloop()  
 
