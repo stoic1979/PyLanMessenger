@@ -154,14 +154,15 @@ class MainGui(Frame):
         statusbar.config(text = file_path)
         print "Will send file", file_path
 
+
+#########################
+#   STARTING MAIN GUI   #
+#########################
 def main():
-  
     root = Tk()
     root.geometry("640x480+200+200")
     app = MainGui(root)
     root.mainloop()  
 
-
 if __name__ == '__main__':
     main()  
-
