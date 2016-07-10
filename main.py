@@ -23,7 +23,6 @@ class MainGui(Frame):
       
         self.hostname = socket.gethostname()
         self.parent.title("Lan Messenger - %s" % self.hostname) 
-        #self.parent.title("Windows")
         self.pack(fill=BOTH, expand=True)
 
         self.columnconfigure(1, weight=1)
@@ -40,8 +39,6 @@ class MainGui(Frame):
 
         #mylist = Listbox(self, yscrollcommand=scrollbar.set)
         mylist = Listbox(self)
-        for line in range(100):
-            mylist.insert(END, "User " + str(line))
         mylist.grid(row=0, column=0, columnspan=1, rowspan=8, padx=5, sticky=E+W+N+S)
 
         self.mylist = mylist
