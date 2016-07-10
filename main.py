@@ -56,6 +56,7 @@ class MainGui(Frame):
 
         area = Listbox(frame2)
         area.grid(row=1, column=0, columnspan=2, rowspan=6, padx=5, sticky=E+W+S+N)
+        self.msg_lst = area
 
         ma = Text(frame2)
         ma.grid(row=4, column=0, columnspan=2, rowspan=2, padx=5, sticky=E+W+S+N)
@@ -80,6 +81,7 @@ class MainGui(Frame):
         self.start_msg_receiver()
         self.send_IAI()
         self.users = {}
+        self.messages = {}
 
     def add_menus(self):
         menubar = Menu(self.parent)
@@ -130,7 +132,7 @@ class MainGui(Frame):
         except:
             return
 
-        self.send_to_ip(self.get_selected_user_ip(txt), msg)
+        self.send_to_ip(self.get_selected_user_ip(txt), msg.strip())
 
     def send_broadcast_message(self, msg):
         """
@@ -145,12 +147,20 @@ class MainGui(Frame):
                 continue
             sock.sendto(msg, (recv_ip, UDP_PORT))
 
+    def add_chat_msg(self, ip, host, msg):
+        if not self.messages.has_key(ip):
+            self.messages[ip] = []
+        m = "%s: %s" % (host, msg)
+        self.messages[ip].append(m)
+        self.msg_lst.insert(END, m)
+
     def send_to_ip(self, ip, msg):
         """
         function to send UDP message to given ip
         """
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         sock.sendto("TCM%s:%s:%s" % (self.ip, self.hostname, msg), (ip, UDP_PORT))
+        self.add_chat_msg(ip, self.hostname, msg)
 
     def monitor_messages(self, thread_name, delay):
         sock = socket.socket(socket.AF_INET, # Internet
@@ -173,12 +183,7 @@ class MainGui(Frame):
                 self.users[host] = ip
                 self.mylist.insert(END, "%s - %s" % (host, ip))
 
-    def handle_TCM(self, msg):
-        status, ip, host, msg = process_TCM(msg)
-        if not status:
-            return
-
-        print "Got message %s from %s" % (msg, ip)
+    def show_popup(self):
         popup = Tk()
         popup.wm_title("Msg from %s" % host)
         popup.geometry("480x320+300+300")
@@ -187,6 +192,14 @@ class MainGui(Frame):
         B1 = Button(popup, text="Okay", command = popup.destroy)
         B1.pack()
         popup.mainloop()
+
+    def handle_TCM(self, msg):
+        status, ip, host, msg = process_TCM(msg.strip())
+        if not status:
+            return
+
+        self.add_chat_msg(ip, host, msg)
+        print "Got message %s from %s" % (msg, ip)
     
     def start_msg_receiver(self):
         """
