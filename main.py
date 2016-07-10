@@ -38,8 +38,6 @@ class MainGui(Frame):
         scrollbar.grid(row=1, column=0, columnspan=2, rowspan=2, padx=5)
 
         mylist = Listbox(self, yscrollcommand=scrollbar.set)
-        for line in range(100):
-            mylist.insert(END, "User " + str(line))
         mylist.grid(row=1, column=0, columnspan=2, rowspan=2, padx=5, sticky=E+W)
 
         self.mylist = mylist
@@ -131,6 +129,13 @@ class MainGui(Frame):
             # buffer size is 1024 bytes
             data, addr = sock.recvfrom(1024)
             print "received message:", data
+            if data[:3] == "IAI":
+                self.handle_IAI(data)
+
+    def handle_IAI(self, msg):
+        status, ip, host = process_IAI(msg)
+        if status:
+            self.mylist.insert(END, "%s - %s" % (host, ip))
 
     def start_msg_receiver(self):
         """
