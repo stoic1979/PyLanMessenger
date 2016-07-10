@@ -17,6 +17,14 @@ def process_IAI(msg):
     except:
         return False, "", ""
 
+def process_TCM(msg):
+    status = True
+    try:
+        l = msg[3:].split(":")
+        return True, l[0], l[1]
+    except:
+        return False, "", ""
+
 if __name__ == "__main__":
     ip = "192.168.1.9"
     print get_ip_prefix(ip)

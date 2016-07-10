@@ -137,7 +137,7 @@ class MainGui(Frame):
         function to send UDP message to given ip
         """
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        sock.sendto("TCM%s" % msg, (ip, UDP_PORT))
+        sock.sendto("TCM%s:%s" % (self.ip, msg), (ip, UDP_PORT))
 
     def monitor_messages(self, thread_name, delay):
         sock = socket.socket(socket.AF_INET, # Internet
@@ -150,6 +150,8 @@ class MainGui(Frame):
             print "received message:", data
             if data[:3] == "IAI":
                 self.handle_IAI(data)
+            if data[:3] == "TCM":
+                self.handle_TCM(data)
 
     def handle_IAI(self, msg):
         status, ip, host = process_IAI(msg)
@@ -157,6 +159,12 @@ class MainGui(Frame):
             if not self.users.has_key(host):
                 self.users[host] = ip
                 self.mylist.insert(END, "%s - %s" % (host, ip))
+
+    def handle_TCM(self, msg):
+        status, ip, msg = process_TCM(msg)
+        if status:
+            print "Got message %s from %s" % (ip, msg)
+
 
     def start_msg_receiver(self):
         """
