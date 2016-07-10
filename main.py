@@ -168,24 +168,13 @@ class MainGui(Frame):
         print "Got message %s from %s" % (msg, ip)
         popup = Tk()
         popup.wm_title("Msg from %s" % host)
+        popup.geometry("480x320+300+300")
         label = Label(popup, text=msg)
         label.pack(side="top", fill="x", pady=10)
         B1 = Button(popup, text="Okay", command = popup.destroy)
         B1.pack()
         popup.mainloop()
     
-    """
-        win = Toplevel()             
-        Label(win,  text=msg).pack() 
-        Button(win, text='OK', command=win.quit).pack()    
-        win.protocol('WM_DELETE_WINDOW', win.quit)         
-        win.focus_set()          
-        win.grab_set()           
-        #win.mainloop()           
-        #win.destroy()
-    """
-
-
     def start_msg_receiver(self):
         """
         function starts a thread to receive messages
