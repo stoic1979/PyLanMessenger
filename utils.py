@@ -17,6 +17,9 @@ def process_IAI(msg):
     except:
         return False, "", ""
 
+def process_MTI(msg):
+    return process_IAI(msg)
+
 def process_TCM(msg):
     status = True
     try:

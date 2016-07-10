@@ -198,7 +198,7 @@ class MainGui(Frame):
         # me too in when other says "i am in"
         self.send_MTI()
 
-        status, ip, host = self.process_MTI(msg)
+        status, ip, host = process_MTI(msg)
         if status:
             if not self.users.has_key(host):
                 self.users[host] = ip
