@@ -41,6 +41,8 @@ class MainGui(Frame):
         mylist = Listbox(self)
         mylist.grid(row=0, column=0, columnspan=1, rowspan=8, padx=5, sticky=E+W+N+S)
 
+        mylist.bind('<<ListboxSelect>>', self.on_user_selection_changed)
+
         self.mylist = mylist
         #scrollbar.config(command=mylist.yview)
         # list....
@@ -108,6 +110,13 @@ class MainGui(Frame):
         # display the menu
         self.parent.config(menu=menubar)
 
+    def on_user_selection_changed(self, evt):
+        # Note here that Tkinter passes an event object to on_user_selection_changed()
+        w = evt.widget
+        index = int(w.curselection()[0])
+        value = w.get(index)
+        print 'You selected item %d: "%s"' % (index, value)
+
     def hello(self):
         print "hello"
 
@@ -136,7 +145,7 @@ class MainGui(Frame):
         except:
             return
 
-        self.send_to_ip(self.get_selected_user_ip(txt), msg.strip())
+        self.send_to_ip(self.users[txt], msg.strip())
 
     def send_broadcast_message(self, msg):
         """
@@ -191,14 +200,14 @@ class MainGui(Frame):
         if status:
             if not self.users.has_key(host):
                 self.users[host] = ip
-                self.mylist.insert(END, "%s - %s" % (host, ip))
+                self.mylist.insert(END, "%s" % host)
 
     def handle_MTI(self, msg):
         status, ip, host = process_MTI(msg)
         if status:
             if not self.users.has_key(host):
                 self.users[host] = ip
-                self.mylist.insert(END, "%s - %s" % (host, ip))
+                self.mylist.insert(END, "%s" % host)
 
     def show_popup(self):
         popup = Tk()
