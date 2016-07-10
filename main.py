@@ -133,6 +133,7 @@ class MainGui(Frame):
                 self.handle_IAI(data)
 
     def handle_IAI(self, msg):
+        self.send_IAI()
         status, ip, host = process_IAI(msg)
         if status:
             self.mylist.insert(END, "%s - %s" % (host, ip))
