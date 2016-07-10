@@ -194,10 +194,6 @@ class MainGui(Frame):
                 self.mylist.insert(END, "%s - %s" % (host, ip))
 
     def handle_MTI(self, msg):
-        # reply with MTI for IAI
-        # me too in when other says "i am in"
-        self.send_MTI()
-
         status, ip, host = process_MTI(msg)
         if status:
             if not self.users.has_key(host):
