@@ -174,7 +174,7 @@ class MainGui(Frame):
         if not self.messages.has_key(host):
             self.messages[host] = []
         m = "%s: %s" % (host, msg)
-        self.messages[ip].append(m)
+        self.messages[host].append(m)
         self.msg_lst.insert(END, m)
 
     def send_to_ip(self, ip, msg):
