@@ -21,7 +21,7 @@ def process_TCM(msg):
     status = True
     try:
         l = msg[3:].split(":")
-        return True, l[0], l[1]
+        return True, l[0], l[1], l[2]
     except:
         return False, "", ""
 

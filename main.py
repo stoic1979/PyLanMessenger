@@ -137,7 +137,7 @@ class MainGui(Frame):
         function to send UDP message to given ip
         """
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        sock.sendto("TCM%s:%s" % (self.ip, msg), (ip, UDP_PORT))
+        sock.sendto("TCM%s:%s:%s" % (self.ip, self.hostname, msg), (ip, UDP_PORT))
 
     def monitor_messages(self, thread_name, delay):
         sock = socket.socket(socket.AF_INET, # Internet
@@ -161,9 +161,29 @@ class MainGui(Frame):
                 self.mylist.insert(END, "%s - %s" % (host, ip))
 
     def handle_TCM(self, msg):
-        status, ip, msg = process_TCM(msg)
-        if status:
-            print "Got message %s from %s" % (ip, msg)
+        status, ip, host, msg = process_TCM(msg)
+        if not status:
+            return
+
+        print "Got message %s from %s" % (msg, ip)
+        popup = Tk()
+        popup.wm_title("Msg from %s" % host)
+        label = Label(popup, text=msg)
+        label.pack(side="top", fill="x", pady=10)
+        B1 = Button(popup, text="Okay", command = popup.destroy)
+        B1.pack()
+        popup.mainloop()
+    
+    """
+        win = Toplevel()             
+        Label(win,  text=msg).pack() 
+        Button(win, text='OK', command=win.quit).pack()    
+        win.protocol('WM_DELETE_WINDOW', win.quit)         
+        win.focus_set()          
+        win.grab_set()           
+        #win.mainloop()           
+        #win.destroy()
+    """
 
 
     def start_msg_receiver(self):
