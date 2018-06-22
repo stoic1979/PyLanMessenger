@@ -30,10 +30,10 @@ def process_TCM(msg):
 
 if __name__ == "__main__":
     ip = "192.168.1.9"
-    print get_ip_prefix(ip)
+    print (get_ip_prefix(ip))
 
     # good
-    print process_IAI("IAI1.2.3.4:navi")
+    print(process_IAI("IAI1.2.3.4:navi"))
 
     # not good
-    print process_IAI("IAI1.2.3.4:navi")
+    print(process_IAI("IAI1.2.3.4:navi"))

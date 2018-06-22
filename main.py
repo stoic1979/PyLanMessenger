@@ -118,7 +118,7 @@ class MainGui(Frame):
         except:
             return
         sel_user = w.get(index)
-        print 'You selected item %d: "%s"' % (index, sel_user)
+        print ("You selected item %d: \"%s\"" % (index, sel_user))
 
         self.msg_lst.delete(0, END)
 
@@ -127,12 +127,12 @@ class MainGui(Frame):
             return
 
         msgs = self.messages[sel_user]
-        print "msgs:", msgs
+        print ("msgs:", msgs)
         for m in msgs:
             self.msg_lst.insert(END, m)
 
     def hello(self):
-        print "hello"
+        print ("hello")
 
     def refresh(self):
         self.send_IAI()
@@ -152,7 +152,7 @@ class MainGui(Frame):
 
     def send_msg(self):
         msg = self.text.get("1.0",END)
-        print "send msg: ", self.text.get("1.0",END)
+        print ("send msg: ", self.text.get("1.0",END))
 
         try:
             host = self.mylist.get(self.mylist.curselection())
@@ -201,7 +201,7 @@ class MainGui(Frame):
         while True:
             # buffer size is 1024 bytes
             data, addr = sock.recvfrom(1024)
-            print "received message:", data
+            print ("received message:", data)
             if data[:3] == "IAI":
                 self.handle_IAI(data)
             if data[:3] == "MTI":
@@ -210,8 +210,12 @@ class MainGui(Frame):
                 self.handle_TCM(data)
 
     def handle_IAI(self, msg):
-        # reply with MTI for IAI
-        # me too in when other says "i am in"
+        """
+        handle "I am In" packet
+
+        reply with MTI for IAI
+        me too in when other says "i am in"
+        """
         self.send_MTI()
 
         status, ip, host = process_IAI(msg)
@@ -221,6 +225,10 @@ class MainGui(Frame):
                 self.mylist.insert(END, "%s" % host)
 
     def handle_MTI(self, msg):
+        """
+        handle Me Too In packet
+        """
+
         status, ip, host = process_MTI(msg)
         if status:
             if not self.users.has_key(host):
@@ -243,7 +251,7 @@ class MainGui(Frame):
             return
 
         self.add_chat_msg(ip, host, "%s: %s" % (host, msg))
-        print "Got message %s from %s" % (msg, ip)
+        print ("Got message %s from %s" % (msg, ip))
     
     def start_msg_receiver(self):
         """
@@ -252,8 +260,8 @@ class MainGui(Frame):
         try:
             thread.start_new_thread(self.monitor_messages, ("MsgRecvThread", 2, ) )
         except Exception as exp:
-            print "Error: unable to start message recevier thread"
-            print exp
+            print ("Error: unable to start message recevier thread")
+            print (exp)
 
     def quit(self):
         self.root.quit()
@@ -265,7 +273,7 @@ class MainGui(Frame):
         statusbar.pack(side=BOTTOM, fill=X)
         file_path = open.show()
         statusbar.config(text = file_path)
-        print "Will send file", file_path
+        print ("Will send file", file_path)
 
 
 #########################
