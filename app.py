@@ -31,8 +31,6 @@ class Window(QMainWindow):
 
         self.hostname = socket.gethostname()
 
-        self.lstBuddies.addItem("Test")
-
         # button event handlers
         self.btnRefreshBuddies.clicked.connect(self.refreshBuddies)
         self.btnSend.clicked.connect(self.sendMsg)
@@ -131,8 +129,8 @@ class Window(QMainWindow):
         for i in range(2, 255):
             recv_ip = "%s.%d" % (get_ip_prefix(self.ip), i)
             # dont send to self
-            #if self.ip == recv_ip:
-                #continue
+            if self.ip == recv_ip:
+                continue
             sock.sendto(bytes(msg, "utf-8"), (recv_ip, UDP_PORT))
 
 
