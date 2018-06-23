@@ -6,7 +6,8 @@ import socket
 
 from PyQt5 import QtGui, QtCore, uic
 from PyQt5.QtCore import pyqtSlot
-from PyQt5.QtWidgets import QApplication, QWidget, QMainWindow, QMessageBox, QListWidgetItem
+from PyQt5.QtWidgets import (
+        QApplication, QWidget, QMainWindow, QMessageBox, QListWidgetItem)
 from PyQt5.uic import loadUi
 
 from utils import *
@@ -35,7 +36,8 @@ class Window(QMainWindow):
         self.btnRefreshBuddies.clicked.connect(self.refreshBuddies)
         self.btnSend.clicked.connect(self.sendMsg)
 
-        self.lstBuddies.currentItemChanged.connect(self.on_buddy_selection_changed)
+        self.lstBuddies.currentItemChanged.connect(
+                self.on_buddy_selection_changed)
 
         self.init_messenger()
 
@@ -49,9 +51,8 @@ class Window(QMainWindow):
         self.users = {}
         self.messages = {}
 
-
     def handle_messages(self, data):
-        print ("[Window] :: handling message:", data)
+        print("[Window] :: handling message:", data)
         if data[:3] == "IAI":
             self.handle_IAI(data)
         if data[:3] == "MTI":
@@ -78,8 +79,8 @@ class Window(QMainWindow):
 
         status, ip, host = process_IAI(msg)
         if status:
-            if not host in self.users:
-                print ("adding host", host)
+            if host not in self.users:
+                print("adding host", host)
                 self.users[host] = ip
                 self.lstBuddies.addItem(str(host))
 
@@ -90,7 +91,7 @@ class Window(QMainWindow):
 
         status, ip, host = process_MTI(msg)
         if status:
-            if not host in self.users:
+            if host not in self.users:
                 self.users[host] = ip
                 self.lstBuddies.addItem(str(host))
 
@@ -106,7 +107,7 @@ class Window(QMainWindow):
         function to send UDP message to all users in LAN
         at given port
         """
-        print ("[INFO] send broadcast: %s" % msg)
+        print("[INFO] send broadcast: %s" % msg)
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         for i in range(2, 255):
             recv_ip = "%s.%d" % (get_ip_prefix(self.ip), i)
@@ -115,25 +116,24 @@ class Window(QMainWindow):
                 continue
             sock.sendto(bytes(msg, "utf-8"), (recv_ip, UDP_PORT))
 
-
     def refreshBuddies(self):
-        print ("[INFO] refreshing buddy list")
+        print("[INFO] refreshing buddy list")
         self.lstBuddies.clear()
         self.users = {}
         self.send_IAI()
 
     def sendMsg(self):
-        print ("[INFO] send Msg")
+        print("[INFO] send Msg")
 
         try:
             host = self.lstBuddies.currentItem().text()
-            print ("recevier:", host)
+            print("recevier:", host)
         except:
-            print ("[WARNING] no host found from selection")
+            print("[WARNING] no host found from selection")
             return
 
         msg = self.teMsg.toPlainText()
-        print ("msg:", msg)
+        print("msg:", msg)
 
         self.send_to_ip(self.users[host], host, msg.strip())
         self.teMsg.setText("")
@@ -145,21 +145,21 @@ class Window(QMainWindow):
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         packet = "TCM%s:%s:%s" % (self.ip, self.hostname, msg)
         sock.sendto(bytes(packet, "utf-8"), (ip, UDP_PORT))
-        self.add_chat_msg(ip, other_host, "%s: %s" % (self.hostname, msg) )
+        self.add_chat_msg(ip, other_host, "%s: %s" % (self.hostname, msg))
 
     def add_chat_msg(self, ip, other_host, msg):
 
         # NOTE:
         # we are storing msgs in dict as per other host
         # both sent/recvd msgs with other host
-        if not other_host in self.messages:
+        if other_host not in self.messages:
             self.messages[other_host] = []
 
         self.messages[other_host].append(msg)
         self.teMsgsList.append(msg)
 
     def on_buddy_selection_changed(self):
-        print("count", self.lstBuddies.count() )
+        print("count", self.lstBuddies.count())
         if self.lstBuddies.count() == 0:
             return
 
@@ -168,30 +168,29 @@ class Window(QMainWindow):
             return
 
         sel_user = self.lstBuddies.currentItem().text()
-        print ("You selected buddy is: \"%s\"" % sel_user)
+        print("You selected buddy is: \"%s\"" % sel_user)
 
         self.teMsgsList.clear()
 
         # no need to continue if there are no messages for selected user
-        if not sel_user in self.messages:
+        if sel_user not in self.messages:
             return
 
         msgs = self.messages[sel_user]
-        print ("msgs:", msgs)
+        print("msgs:", msgs)
         for m in msgs:
             self.teMsgsList.append(m)
-
 
     def show_msgbox(self, title, text):
         """
         Function for showing error/info message box
         """
         msg = QMessageBox()
-        msg.setIcon(QMessageBox.Information) 
+        msg.setIcon(QMessageBox.Information)
         msg.setText(text)
         msg.setWindowTitle(title)
         msg.setStandardButtons(QMessageBox.Ok)
-	
+
         retval = msg.exec_()
         print("[INFO] Value of pressed message box button:", retval)
 
@@ -205,6 +204,6 @@ if __name__ == '__main__':
 
     app = QApplication(sys.argv)
     window = Window()
-    window.resize(1240, 820)	
+    window.resize(1240, 820)
     window.show()
     sys.exit(app.exec_())
