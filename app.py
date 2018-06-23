@@ -31,9 +31,13 @@ class Window(QMainWindow):
 
         self.hostname = socket.gethostname()
 
+        self.lstBuddies.addItem("Test")
+
         # button event handlers
         self.btnRefreshBuddies.clicked.connect(self.refreshBuddies)
         self.btnSend.clicked.connect(self.sendMsg)
+
+        self.lstBuddies.currentItemChanged.connect(self.on_buddy_selection_changed)
 
         self.init_messenger()
 
@@ -73,7 +77,6 @@ class Window(QMainWindow):
             if data[:3] == "TCM":
                 self.handle_TCM(data)
 
-
     def send_IAI(self):
         # broadcast a message that IAI - "I Am In" the n/w
         self.send_broadcast_message("IAI%s:%s" % (self.ip, self.hostname))
@@ -108,6 +111,14 @@ class Window(QMainWindow):
             if not host in self.users:
                 self.users[host] = ip
                 self.lstBuddies.addItem(str(host))
+
+    def handle_TCM(self, msg):
+        status, ip, host, msg = process_TCM(msg.strip())
+        if not status:
+            return
+
+        self.add_chat_msg(ip, host, "%s: %s" % (host, msg))
+        print ("Got message %s from %s" % (msg, ip))
 
 
     def send_broadcast_message(self, msg):
@@ -165,6 +176,29 @@ class Window(QMainWindow):
 
         self.messages[other_host].append(msg)
         self.teMsgsList.append(msg)
+
+    def on_buddy_selection_changed(self):
+        print("count", self.lstBuddies.count() )
+        if self.lstBuddies.count() == 0:
+            return
+
+        # no buddy selected
+        if not self.lstBuddies.currentItem():
+            return
+
+        sel_user = self.lstBuddies.currentItem().text()
+        print ("You selected buddy is: \"%s\"" % sel_user)
+
+        self.teMsgsList.clear()
+
+        # no need to continue if there are no messages for selected user
+        if not sel_user in self.messages:
+            return
+
+        msgs = self.messages[sel_user]
+        print ("msgs:", msgs)
+        for m in msgs:
+            self.teMsgsList.append(m)
 
 
     def show_msgbox(self, title, text):
