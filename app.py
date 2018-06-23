@@ -3,7 +3,6 @@
 import sys
 import os
 import socket
-import _thread as thread
 
 from PyQt5 import QtGui, QtCore, uic
 from PyQt5.QtCore import pyqtSlot
@@ -12,6 +11,7 @@ from PyQt5.uic import loadUi
 
 from utils import *
 from settings import *
+from msg_hndlr import MessageHandler
 
 DIRPATH = os.path.join(os.path.dirname(os.path.abspath(__file__)))
 
@@ -39,41 +39,25 @@ class Window(QMainWindow):
 
         self.init_messenger()
 
+        self.message_handler = MessageHandler()
+        self.message_handler.message_received.connect(self.handle_messages)
+
     def init_messenger(self):
         # getting IP Address of system
         self.ip = get_ip_address()
-        self.start_msg_receiver()
         self.send_IAI()
         self.users = {}
         self.messages = {}
 
-    def start_msg_receiver(self):
-        """
-        function starts a thread to receive messages
-        """
-        try:
-            thread.start_new_thread(self.monitor_messages, ("MsgRecvThread", 2, ) )
-        except Exception as exp:
-            print ("Error: unable to start message recevier thread")
-            print (exp)
 
-    def monitor_messages(self, thread_name, delay):
-        sock = socket.socket(socket.AF_INET, # Internet
-                            socket.SOCK_DGRAM) # UDP
-        sock.bind(('', UDP_PORT))
-
-        while True:
-            # buffer size is 1024 bytes
-            org_data, addr = sock.recvfrom(1024)
-            data = org_data.decode("utf-8") 
-            
-            print ("received message:", data)
-            if data[:3] == "IAI":
-                self.handle_IAI(data)
-            if data[:3] == "MTI":
-                self.handle_MTI(data)
-            if data[:3] == "TCM":
-                self.handle_TCM(data)
+    def handle_messages(self, data):
+        print ("[Window] :: handling message:", data)
+        if data[:3] == "IAI":
+            self.handle_IAI(data)
+        if data[:3] == "MTI":
+            self.handle_MTI(data)
+        if data[:3] == "TCM":
+            self.handle_TCM(data)
 
     def send_IAI(self):
         # broadcast a message that IAI - "I Am In" the n/w
@@ -116,8 +100,6 @@ class Window(QMainWindow):
             return
 
         self.add_chat_msg(ip, host, "%s: %s" % (host, msg))
-        print ("Got message %s from %s" % (msg, ip))
-
 
     def send_broadcast_message(self, msg):
         """
