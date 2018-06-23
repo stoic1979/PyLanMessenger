@@ -154,6 +154,7 @@ class Window(QMainWindow):
         print ("msg:", msg)
 
         self.send_to_ip(self.users[host], host, msg.strip())
+        self.teMsg.setText("")
 
     def send_to_ip(self, ip, other_host, msg):
         """
