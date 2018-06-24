@@ -63,9 +63,14 @@ class MessageListener(QObject):
         sock.bind(('', UDP_PORT))
 
         while True:
-            # buffer size is 1024 bytes
-            org_data, addr = sock.recvfrom(1024)
-            data = org_data.decode("utf-8")
+            try:
+                # buffer size is 1024 bytes
+                org_data, addr = sock.recvfrom(1024)
+                data = org_data.decode("utf-8")
 
-            log.info("received message: " + data)
-            self.message_received.emit(data)
+                log.info("received message: " + data)
+                self.message_received.emit(data)
+            except Exception as exp:
+                log.warning("Got exception while monitoring messages")
+                log.warning(exp)
+
