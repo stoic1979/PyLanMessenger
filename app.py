@@ -34,6 +34,7 @@ from PyQt5.uic import loadUi
 from utils import *
 from settings import *
 from msg_listener import MessageListener
+from msg_manager import MessageManager
 
 DIRPATH = os.path.join(os.path.dirname(os.path.abspath(__file__)))
 
@@ -62,15 +63,17 @@ class Window(QMainWindow):
 
         self.init_messenger()
 
+        self.msg_manager = MessageManager()
+
         self.message_listener = MessageListener()
         self.message_listener.message_received.connect(self.handle_messages)
+
 
     def init_messenger(self):
         # getting IP Address of system
         self.ip = get_ip_address()
         self.send_IAI()
         self.users = {}
-        self.messages = {}
 
     def handle_messages(self, data):
         print("[Window] :: handling message:", data)
@@ -170,13 +173,9 @@ class Window(QMainWindow):
 
     def add_chat_msg(self, ip, other_host, msg):
 
-        # NOTE:
-        # we are storing msgs in dict as per other host
-        # both sent/recvd msgs with other host
-        if other_host not in self.messages:
-            self.messages[other_host] = []
+        self.msg_manager.add_chat_msg(ip, other_host, msg)
 
-        self.messages[other_host].append(msg)
+        # showing msg in UI
         self.teMsgsList.append(msg)
 
     def on_buddy_selection_changed(self):
@@ -193,12 +192,7 @@ class Window(QMainWindow):
 
         self.teMsgsList.clear()
 
-        # no need to continue if there are no messages for selected user
-        if sel_user not in self.messages:
-            return
-
-        msgs = self.messages[sel_user]
-        print("msgs:", msgs)
+        msgs = self.msg_manager.get_message_for_user(sel_user)
         for m in msgs:
             self.teMsgsList.append(m)
 
