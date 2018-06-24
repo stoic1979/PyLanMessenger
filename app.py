@@ -34,6 +34,7 @@ from PyQt5.uic import loadUi
 from utils import *
 from settings import *
 from msg_listener import MessageListener
+from msg_sender import MessageSender
 from msg_manager import MessageManager
 from packetizer import Packet
 
@@ -58,7 +59,10 @@ class Window(QMainWindow):
 
         # self.show_msgbox("Info", "Lan Messenger")
 
+        self.users = {}
+
         self.host = socket.gethostname()
+        self.ip = get_ip_address()
 
         # button event handlers
         self.btnRefreshBuddies.clicked.connect(self.refreshBuddies)
@@ -67,18 +71,13 @@ class Window(QMainWindow):
         self.lstBuddies.currentItemChanged.connect(
                 self.on_buddy_selection_changed)
 
-        self.init_messenger()
-
         self.msg_manager = MessageManager()
+        self.msg_sender = MessageSender(self.host, self.ip)
 
         self.message_listener = MessageListener()
         self.message_listener.message_received.connect(self.handle_messages)
 
-    def init_messenger(self):
-        # getting IP Address of system
-        self.ip = get_ip_address()
         self.send_IAI()
-        self.users = {}
 
     def handle_messages(self, data):
         log.debug("UI handling message: %s" % data)
@@ -94,12 +93,12 @@ class Window(QMainWindow):
     def send_IAI(self):
         # broadcast a message that IAI - "I Am In" the n/w
         pkt = Packet(op="IAI", ip=self.ip, host=self.host).to_json()
-        self.send_broadcast_message(pkt)
+        self.msg_sender.send_broadcast_message(pkt)
 
     def send_MTI(self):
         # broadcast a message that MTI - "Me Too In" the n/w
         pkt = Packet(op="MTI", ip=self.ip, host=self.host).to_json()
-        self.send_broadcast_message(pkt)
+        self.msg_sender.send_broadcast_message(pkt)
 
     def handle_IAI(self, ip, host):
         """
@@ -127,21 +126,6 @@ class Window(QMainWindow):
     def handle_TCM(self, ip, host, msg):
         self.add_chat_msg(ip, host, "%s: %s" % (host, msg))
 
-    def send_broadcast_message(self, msg):
-        """
-        function to send UDP message to all users in LAN
-        at given port
-        """
-        log.debug("send broadcast: %s" % msg)
-
-        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        for i in range(2, 255):
-            recv_ip = "%s.%d" % (get_ip_prefix(self.ip), i)
-            # dont send to self
-            if self.ip == recv_ip:
-                continue
-            sock.sendto(bytes(msg, "utf-8"), (recv_ip, UDP_PORT))
-
     def refreshBuddies(self):
         self.lstBuddies.clear()
         self.users = {}
@@ -149,26 +133,24 @@ class Window(QMainWindow):
 
     def sendMsg(self):
         try:
-            host = self.lstBuddies.currentItem().text()
+            receiver_host = self.lstBuddies.currentItem().text()
         except:
             log.warning("no host found from selection")
             return
 
         msg = self.teMsg.toPlainText()
 
-        self.send_to_ip(self.users[host], host, msg.strip())
+        receiver_ip = self.users[receiver_host]
+
+        # sending msg to receiver
+        self.msg_sender.send_to_ip(receiver_ip, receiver_host, msg.strip())
+
+        # adding my message in chat area in UI
+        self.add_chat_msg(
+                receiver_ip, receiver_host, "%s: %s" % (self.host, msg))
+
+        # cleaning up textbox for typed message in UI
         self.teMsg.setText("")
-
-    def send_to_ip(self, ip, other_host, msg):
-        """
-        function to send UDP message to given ip
-        """
-        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-
-        pkt = Packet(
-                op="TCM", ip=self.ip, host=self.host, msg=msg).to_json()
-        sock.sendto(bytes(pkt, "utf-8"), (ip, UDP_PORT))
-        self.add_chat_msg(ip, other_host, "%s: %s" % (self.host, msg))
 
     def add_chat_msg(self, ip, other_host, msg):
 
