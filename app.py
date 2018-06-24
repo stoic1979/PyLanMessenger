@@ -33,7 +33,7 @@ from PyQt5.uic import loadUi
 
 from utils import *
 from settings import *
-from msg_hndlr import MessageHandler
+from msg_listener import MessageListener
 
 DIRPATH = os.path.join(os.path.dirname(os.path.abspath(__file__)))
 
@@ -62,8 +62,8 @@ class Window(QMainWindow):
 
         self.init_messenger()
 
-        self.message_handler = MessageHandler()
-        self.message_handler.message_received.connect(self.handle_messages)
+        self.message_listener = MessageListener()
+        self.message_listener.message_received.connect(self.handle_messages)
 
     def init_messenger(self):
         # getting IP Address of system

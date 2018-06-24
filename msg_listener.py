@@ -22,7 +22,7 @@
 """
 
 #
-# UDP message handler
+# UDP message listener
 #
 # It emits/sends messages recevied via nw to UI
 #
@@ -33,13 +33,13 @@ from PyQt5.QtCore import QObject, pyqtSignal
 from settings import *
 
 
-class MessageHandler(QObject):
+class MessageListener(QObject):
 
     # define signal to inform UI about a received message
     message_received = pyqtSignal('QString')
 
     def __init__(self):
-        super(MessageHandler, self).__init__()
+        super(MessageListener, self).__init__()
 
         self.start_msg_receiver()
 
@@ -63,5 +63,5 @@ class MessageHandler(QObject):
             org_data, addr = sock.recvfrom(1024)
             data = org_data.decode("utf-8")
 
-            print("[MessageHandler] :: received message:", data)
+            print("[MessageListener] :: received message:", data)
             self.message_received.emit(data)
