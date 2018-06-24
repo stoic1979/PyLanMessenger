@@ -35,6 +35,7 @@ from utils import *
 from settings import *
 from msg_listener import MessageListener
 from msg_manager import MessageManager
+from packetizer import Packet
 
 
 # getting an instance of singleton logger
@@ -57,7 +58,7 @@ class Window(QMainWindow):
 
         # self.show_msgbox("Info", "Lan Messenger")
 
-        self.hostname = socket.gethostname()
+        self.host = socket.gethostname()
 
         # button event handlers
         self.btnRefreshBuddies.clicked.connect(self.refreshBuddies)
@@ -90,11 +91,12 @@ class Window(QMainWindow):
 
     def send_IAI(self):
         # broadcast a message that IAI - "I Am In" the n/w
-        self.send_broadcast_message("IAI%s:%s" % (self.ip, self.hostname))
+        pkt = Packet(op="IAI", ip=self.ip, host=self.host).to_json()
+        self.send_broadcast_message(pkt)
 
     def send_MTI(self):
         # broadcast a message that MTI - "Me Too In" the n/w
-        self.send_broadcast_message("MTI%s:%s" % (self.ip, self.hostname))
+        self.send_broadcast_message("MTI%s:%s" % (self.ip, self.host))
 
     def handle_IAI(self, msg):
         """
@@ -167,9 +169,12 @@ class Window(QMainWindow):
         function to send UDP message to given ip
         """
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        packet = "TCM%s:%s:%s" % (self.ip, self.hostname, msg)
-        sock.sendto(bytes(packet, "utf-8"), (ip, UDP_PORT))
-        self.add_chat_msg(ip, other_host, "%s: %s" % (self.hostname, msg))
+
+        pkt = Packet(
+                op="TCM", ip=self.ip, host=self.host, msg=msg).to_json()
+        #packet = "TCM%s:%s:%s" % (self.ip, self.host, msg)
+        sock.sendto(bytes(pkt, "utf-8"), (ip, UDP_PORT))
+        self.add_chat_msg(ip, other_host, "%s: %s" % (self.host, msg))
 
     def add_chat_msg(self, ip, other_host, msg):
 
