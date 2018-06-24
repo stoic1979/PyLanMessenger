@@ -18,9 +18,9 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>50</y>
+      <y>310</y>
       <width>191</width>
-      <height>531</height>
+      <height>271</height>
      </rect>
     </property>
    </widget>
@@ -28,7 +28,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>20</y>
+      <y>280</y>
       <width>68</width>
       <height>17</height>
      </rect>
@@ -94,6 +94,29 @@
     </property>
     <property name="text">
      <string>Send File</string>
+    </property>
+   </widget>
+   <widget class="QListWidget" name="lstGroups">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>60</y>
+      <width>191</width>
+      <height>211</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_2">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>20</y>
+      <width>68</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Groups</string>
     </property>
    </widget>
   </widget>

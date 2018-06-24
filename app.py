@@ -219,6 +219,6 @@ if __name__ == '__main__':
 
     app = QApplication(sys.argv)
     window = Window()
-    window.resize(1240, 820)
+    #window.resize(1240, 820)
     window.show()
     sys.exit(app.exec_())
