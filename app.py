@@ -36,6 +36,11 @@ from settings import *
 from msg_listener import MessageListener
 from msg_manager import MessageManager
 
+
+# getting an instance of singleton logger
+from logger import get_logger
+log = get_logger()
+
 DIRPATH = os.path.join(os.path.dirname(os.path.abspath(__file__)))
 
 
@@ -68,7 +73,6 @@ class Window(QMainWindow):
         self.message_listener = MessageListener()
         self.message_listener.message_received.connect(self.handle_messages)
 
-
     def init_messenger(self):
         # getting IP Address of system
         self.ip = get_ip_address()
@@ -76,7 +80,7 @@ class Window(QMainWindow):
         self.users = {}
 
     def handle_messages(self, data):
-        print("[Window] :: handling message:", data)
+        log.debug("handling message: %s" % data)
         if data[:3] == "IAI":
             self.handle_IAI(data)
         if data[:3] == "MTI":
@@ -131,7 +135,8 @@ class Window(QMainWindow):
         function to send UDP message to all users in LAN
         at given port
         """
-        print("[INFO] send broadcast: %s" % msg)
+        log.debug("send broadcast: %s" % msg)
+
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         for i in range(2, 255):
             recv_ip = "%s.%d" % (get_ip_prefix(self.ip), i)
@@ -141,23 +146,18 @@ class Window(QMainWindow):
             sock.sendto(bytes(msg, "utf-8"), (recv_ip, UDP_PORT))
 
     def refreshBuddies(self):
-        print("[INFO] refreshing buddy list")
         self.lstBuddies.clear()
         self.users = {}
         self.send_IAI()
 
     def sendMsg(self):
-        print("[INFO] send Msg")
-
         try:
             host = self.lstBuddies.currentItem().text()
-            print("recevier:", host)
         except:
-            print("[WARNING] no host found from selection")
+            log.warning("no host found from selection")
             return
 
         msg = self.teMsg.toPlainText()
-        print("msg:", msg)
 
         self.send_to_ip(self.users[host], host, msg.strip())
         self.teMsg.setText("")
@@ -179,7 +179,6 @@ class Window(QMainWindow):
         self.teMsgsList.append(msg)
 
     def on_buddy_selection_changed(self):
-        print("count", self.lstBuddies.count())
         if self.lstBuddies.count() == 0:
             return
 
@@ -188,7 +187,7 @@ class Window(QMainWindow):
             return
 
         sel_user = self.lstBuddies.currentItem().text()
-        print("You selected buddy is: \"%s\"" % sel_user)
+        log.debug("You selected buddy is: \"%s\"" % sel_user)
 
         self.teMsgsList.clear()
 
@@ -205,9 +204,7 @@ class Window(QMainWindow):
         msg.setText(text)
         msg.setWindowTitle(title)
         msg.setStandardButtons(QMessageBox.Ok)
-
         retval = msg.exec_()
-        print("[INFO] Value of pressed message box button:", retval)
 
 
 ##############################################################################
@@ -219,6 +216,6 @@ if __name__ == '__main__':
 
     app = QApplication(sys.argv)
     window = Window()
-    #window.resize(1240, 820)
+    # window.resize(1240, 820)
     window.show()
     sys.exit(app.exec_())
