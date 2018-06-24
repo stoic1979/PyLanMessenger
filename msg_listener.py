@@ -73,4 +73,3 @@ class MessageListener(QObject):
             except Exception as exp:
                 log.warning("Got exception while monitoring messages")
                 log.warning(exp)
-

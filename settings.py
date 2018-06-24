@@ -29,3 +29,13 @@
 
 UDP_IP = "127.0.0.1"
 UDP_PORT = 5005
+
+#
+# packet/buffer size to send each packet during file transfer
+#
+FILE_PKT_SIZE = 4096
+
+#
+# port for receiving files
+#
+FILE_RECV_PORT = 8888
