@@ -81,13 +81,15 @@ class Window(QMainWindow):
         self.users = {}
 
     def handle_messages(self, data):
-        log.debug("handling message: %s" % data)
-        if data[:3] == "IAI":
-            self.handle_IAI(data)
-        if data[:3] == "MTI":
-            self.handle_MTI(data)
-        if data[:3] == "TCM":
-            self.handle_TCM(data)
+        log.debug("UI handling message: %s" % data)
+        pkt = Packet()
+        pkt.json_to_obj(data)
+        if pkt.op == "IAI":
+            self.handle_IAI(pkt.ip, pkt.host)
+        if pkt.op == "MTI":
+            self.handle_MTI(pkt.ip, pkt.host)
+        if pkt.op == "TCM":
+            self.handle_TCM(pkt.ip, pkt.host, pkt.msg)
 
     def send_IAI(self):
         # broadcast a message that IAI - "I Am In" the n/w
@@ -96,9 +98,10 @@ class Window(QMainWindow):
 
     def send_MTI(self):
         # broadcast a message that MTI - "Me Too In" the n/w
-        self.send_broadcast_message("MTI%s:%s" % (self.ip, self.host))
+        pkt = Packet(op="MTI", ip=self.ip, host=self.host).to_json()
+        self.send_broadcast_message(pkt)
 
-    def handle_IAI(self, msg):
+    def handle_IAI(self, ip, host):
         """
         handle "I am In" packet
 
@@ -107,29 +110,21 @@ class Window(QMainWindow):
         """
         self.send_MTI()
 
-        status, ip, host = process_IAI(msg)
-        if status:
-            if host not in self.users:
-                print("adding host", host)
-                self.users[host] = ip
-                self.lstBuddies.addItem(str(host))
+        if host not in self.users:
+            print("adding host", host)
+            self.users[host] = ip
+            self.lstBuddies.addItem(str(host))
 
-    def handle_MTI(self, msg):
+    def handle_MTI(self, ip, host):
         """
         handle Me Too In packet
         """
 
-        status, ip, host = process_MTI(msg)
-        if status:
-            if host not in self.users:
-                self.users[host] = ip
-                self.lstBuddies.addItem(str(host))
+        if host not in self.users:
+            self.users[host] = ip
+            self.lstBuddies.addItem(str(host))
 
-    def handle_TCM(self, msg):
-        status, ip, host, msg = process_TCM(msg.strip())
-        if not status:
-            return
-
+    def handle_TCM(self, ip, host, msg):
         self.add_chat_msg(ip, host, "%s: %s" % (host, msg))
 
     def send_broadcast_message(self, msg):
@@ -172,7 +167,6 @@ class Window(QMainWindow):
 
         pkt = Packet(
                 op="TCM", ip=self.ip, host=self.host, msg=msg).to_json()
-        #packet = "TCM%s:%s:%s" % (self.ip, self.host, msg)
         sock.sendto(bytes(pkt, "utf-8"), (ip, UDP_PORT))
         self.add_chat_msg(ip, other_host, "%s: %s" % (self.host, msg))
 

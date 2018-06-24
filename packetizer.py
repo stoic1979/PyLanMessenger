@@ -38,6 +38,22 @@ class Packet:
         return json.dumps(
                 self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
 
+    def json_to_obj(self, json_str):
+        """
+        function to create a packet from json string
+
+        Note:
+        when using this function first creat an empty packet and
+        then call this function this json string
+
+        eg.
+        pkt = Packet()
+        pkt.json_to_obj(json_str)
+
+        """
+        for key, value in json.loads(json_str).items():
+            setattr(self, key, value)
+
 
 if __name__ == '__main__':
     # testing "I Am In" packet
@@ -50,3 +66,9 @@ if __name__ == '__main__':
     print(Packet(
         op="TCM", ip="192.168.1.20", host="tom",
         msg="Hi neo, its Tom here!!!").to_json())
+
+    # creating packet from json recevied from network
+    j = json.dumps({"ip": "1.2.3.4", "host": "navi", "op": "IAI"})
+    pkt = Packet()
+    pkt.json_to_obj(j)
+    print("Packet: op=%s, ip=%s, host=%s" % (pkt.op, pkt.ip, pkt.host))
