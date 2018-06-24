@@ -39,6 +39,8 @@ from msg_sender import MessageSender
 from msg_manager import MessageManager
 from packetizer import Packet
 
+from about_dialog import AboutDialog
+
 
 # getting an instance of singleton logger
 from logger import get_logger
@@ -81,6 +83,19 @@ class Window(QMainWindow):
         self.send_IAI()
 
         self.setup_tray_menu()
+
+        # setting up handlers for menubar actions
+        self.actionAbout.triggered.connect(self.about)
+        self.actionExit.triggered.connect(qApp.quit)
+        self.actionPreferences.triggered.connect(self.show_preferences)
+
+    def about(self):
+        print("about")
+        ad = AboutDialog()
+        ad.display()
+
+    def show_preferences(self):
+        print("preferences")
 
     def setup_tray_menu(self):
 
