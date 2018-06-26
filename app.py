@@ -40,6 +40,7 @@ from msg_manager import MessageManager
 from packetizer import Packet
 
 from about_dialog import AboutDialog
+from prefs_dialog import PrefsDialog
 
 
 # getting an instance of singleton logger
@@ -96,6 +97,8 @@ class Window(QMainWindow):
 
     def show_preferences(self):
         print("preferences")
+        pd = PrefsDialog()
+        pd.display()
 
     def setup_tray_menu(self):
 
